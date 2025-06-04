@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -156,17 +155,15 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-950 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gray-950 flex flex-col">
       <Header />
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex min-h-0">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <CalendarGrid 
-            tasks={tasks}
-            onTaskMove={handleTaskMove}
-            onTaskEdit={handleTaskEdit}
-          />
-        </div>
+        <CalendarGrid 
+          tasks={tasks}
+          onTaskMove={handleTaskMove}
+          onTaskEdit={handleTaskEdit}
+        />
       </div>
     </div>
   );

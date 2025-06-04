@@ -70,30 +70,37 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-hidden">
-      {/* Header */}
-      <div className="grid grid-cols-10 gap-px bg-gray-800 mb-px">
-        {days.map((day, index) => (
-          <div key={index} className="bg-gray-900 p-3 text-center">
-            <div className="text-gray-400 text-sm">{day.name}</div>
-            {day.isNext && (
-              <div className={`w-8 h-8 mx-auto mt-1 rounded-full flex items-center justify-center text-sm font-medium ${
-                day.day === 1 ? 'bg-blue-600 text-white' : 'text-gray-300'
-              }`}>
-                {day.day}
-              </div>
-            )}
-          </div>
-        ))}
+    <div className="flex-1 bg-gray-950 overflow-auto">
+      {/* Header with day names */}
+      <div className="sticky top-0 bg-gray-900 border-b border-gray-800 z-10">
+        <div className="grid grid-cols-10 gap-px">
+          {days.map((day, index) => (
+            <div key={index} className="bg-gray-900 p-4 text-center border-r border-gray-800 last:border-r-0">
+              <div className="text-gray-300 text-sm font-medium">{day.name}</div>
+              {day.isNext && (
+                <div className={`w-8 h-8 mx-auto mt-2 rounded-full flex items-center justify-center text-sm font-medium ${
+                  day.day === 1 ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'
+                }`}>
+                  {day.day}
+                </div>
+              )}
+              {!day.isNext && (
+                <div className="w-8 h-8 mx-auto mt-2 rounded-full flex items-center justify-center text-sm font-medium text-gray-500">
+                  {day.day}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Calendar Body */}
-      <div className="grid grid-cols-10 gap-px bg-gray-800 h-full">
+      <div className="grid grid-cols-10 gap-px bg-gray-800">
         {days.map((day) => (
           users.map((userId) => (
             <div
               key={`${day.day}-${userId}`}
-              className="bg-gray-900 p-2 min-h-[120px] relative hover:bg-gray-800/50 transition-colors"
+              className="bg-gray-900 p-3 min-h-[150px] border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors relative"
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, day.day, userId)}
             >
@@ -118,7 +125,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
               
               {/* Drop zone indicator */}
               {draggedTask && (
-                <div className="absolute inset-0 border-2 border-dashed border-blue-500/50 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
               )}
             </div>
           ))
