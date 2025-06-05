@@ -8,13 +8,14 @@ interface Task {
   subtitle?: string;
   duration: string;
   color: 'blue' | 'purple' | 'pink' | 'cyan' | 'brown' | 'green';
-  day: number;
+  startDay: number;
+  endDay: number;
   userId: string;
 }
 
 interface CalendarGridProps {
   tasks: Task[];
-  onTaskMove: (taskId: string, newDay: number, newUserId: string) => void;
+  onTaskMove: (taskId: string, newStartDay: number, newUserId: string) => void;
   onTaskEdit: (taskId: string) => void;
 }
 
@@ -83,8 +84,31 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     }
   };
 
-  const getTasksForDayAndUser = (day: number, userId: string) => {
-    return tasks.filter(task => task.day === day && task.userId === userId);
+  const getTasksForUser = (userId: string) => {
+    return tasks.filter(task => task.userId === userId);
+  };
+
+  const getDayIndex = (day: number) => {
+    return days.findIndex(d => d.day === day);
+  };
+
+  const getTaskWidth = (task: Task) => {
+    const startIndex = getDayIndex(task.startDay);
+    const endIndex = getDayIndex(task.endDay);
+    
+    if (startIndex === -1 || endIndex === -1) return 1;
+    
+    return endIndex - startIndex + 1;
+  };
+
+  const getTaskStartPosition = (task: Task) => {
+    return getDayIndex(task.startDay);
+  };
+
+  const isTaskVisible = (task: Task) => {
+    const startIndex = getDayIndex(task.startDay);
+    const endIndex = getDayIndex(task.endDay);
+    return startIndex !== -1 || endIndex !== -1;
   };
 
   return (
@@ -134,39 +158,67 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
               </div>
             </div>
             
-            {/* Calendar cells for this user */}
-            {days.map((day) => (
-              <div
-                key={`${day.day}-${user.id}`}
-                className="bg-gray-900 p-3 min-h-[100px] border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors relative"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, day.day, user.id)}
-              >
-                <div className="space-y-2">
-                  {getTasksForDayAndUser(day.day, user.id).map((task) => (
-                    <TaskBlock
-                      key={task.id}
-                      id={task.id}
-                      title={task.title}
-                      subtitle={task.subtitle}
-                      duration={task.duration}
-                      color={task.color}
-                      isEditing={editingTask === task.id}
-                      onEdit={() => {
-                        setEditingTask(editingTask === task.id ? null : task.id);
-                        onTaskEdit(task.id);
-                      }}
-                      onDragStart={(e) => handleDragStart(e, task.id)}
-                    />
-                  ))}
-                </div>
-                
-                {/* Drop zone indicator */}
-                {draggedTask && (
-                  <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
-                )}
+            {/* Calendar row for this user - relative positioned for absolute task positioning */}
+            <div className="col-span-10 relative bg-gray-900 min-h-[100px]">
+              {/* Grid overlay for drop zones */}
+              <div className="grid grid-cols-10 gap-px h-full">
+                {days.map((day) => (
+                  <div
+                    key={`${day.day}-${user.id}`}
+                    className="bg-gray-900 p-3 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, day.day, user.id)}
+                  >
+                    {/* Drop zone indicator */}
+                    {draggedTask && (
+                      <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+              
+              {/* Multi-day tasks positioned absolutely */}
+              <div className="absolute inset-0 p-3">
+                {getTasksForUser(user.id).map((task) => {
+                  if (!isTaskVisible(task)) return null;
+                  
+                  const startPos = getTaskStartPosition(task);
+                  const width = getTaskWidth(task);
+                  
+                  if (startPos === -1) return null;
+                  
+                  const leftPercentage = (startPos / 10) * 100;
+                  const widthPercentage = (width / 10) * 100;
+                  
+                  return (
+                    <div
+                      key={task.id}
+                      className="absolute top-3"
+                      style={{
+                        left: `${leftPercentage}%`,
+                        width: `${widthPercentage - 0.5}%`,
+                        zIndex: 10
+                      }}
+                    >
+                      <TaskBlock
+                        id={task.id}
+                        title={task.title}
+                        subtitle={task.subtitle}
+                        duration={task.duration}
+                        color={task.color}
+                        isEditing={editingTask === task.id}
+                        isMultiDay={width > 1}
+                        onEdit={() => {
+                          setEditingTask(editingTask === task.id ? null : task.id);
+                          onTaskEdit(task.id);
+                        }}
+                        onDragStart={(e) => handleDragStart(e, task.id)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         ))}
       </div>

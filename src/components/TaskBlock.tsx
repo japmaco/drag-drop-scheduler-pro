@@ -9,6 +9,7 @@ interface TaskBlockProps {
   color: 'blue' | 'purple' | 'pink' | 'cyan' | 'brown' | 'green';
   startTime?: string;
   isEditing?: boolean;
+  isMultiDay?: boolean;
   onEdit?: () => void;
   onDragStart?: (e: React.DragEvent) => void;
 }
@@ -21,6 +22,7 @@ export const TaskBlock: React.FC<TaskBlockProps> = ({
   color,
   startTime,
   isEditing = false,
+  isMultiDay = false,
   onEdit,
   onDragStart
 }) => {
@@ -41,12 +43,13 @@ export const TaskBlock: React.FC<TaskBlockProps> = ({
       className={`
         ${colorClasses[color]} 
         rounded-lg p-3 text-white cursor-pointer transition-all duration-200 
-        hover:scale-105 hover:shadow-lg relative group
+        hover:scale-105 hover:shadow-lg relative group w-full
+        ${isMultiDay ? 'min-h-[60px]' : ''}
       `}
     >
       <div className="flex justify-between items-start mb-1">
-        <h4 className="font-medium text-sm leading-tight">{title}</h4>
-        <span className="text-xs opacity-75 ml-2">{duration}</span>
+        <h4 className="font-medium text-sm leading-tight truncate flex-1 mr-2">{title}</h4>
+        <span className="text-xs opacity-75 whitespace-nowrap">{duration}</span>
       </div>
       {subtitle && (
         <p className="text-xs opacity-75 leading-tight">{subtitle}</p>
@@ -60,12 +63,21 @@ export const TaskBlock: React.FC<TaskBlockProps> = ({
         <div className="absolute inset-0 border-2 border-white rounded-lg pointer-events-none" />
       )}
       
-      {/* Drag handle */}
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-50 transition-opacity">
+      {/* Drag handle - positioned differently for multi-day tasks */}
+      <div className={`absolute opacity-0 group-hover:opacity-50 transition-opacity ${
+        isMultiDay ? 'top-2 left-2' : 'top-2 right-2'
+      }`}>
         <div className="w-1 h-1 bg-white rounded-full mb-0.5"></div>
         <div className="w-1 h-1 bg-white rounded-full mb-0.5"></div>
         <div className="w-1 h-1 bg-white rounded-full"></div>
       </div>
+      
+      {/* Multi-day indicator */}
+      {isMultiDay && (
+        <div className="absolute bottom-2 right-2 text-xs opacity-60">
+          Multi-day
+        </div>
+      )}
     </div>
   );
 };

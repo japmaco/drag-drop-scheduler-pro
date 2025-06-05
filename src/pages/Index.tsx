@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -9,7 +10,8 @@ interface Task {
   subtitle?: string;
   duration: string;
   color: 'blue' | 'purple' | 'pink' | 'cyan' | 'brown' | 'green';
-  day: number;
+  startDay: number;
+  endDay: number;
   userId: string;
 }
 
@@ -20,7 +22,8 @@ const Index = () => {
       title: 'Revisions / EMEA launch / Grab',
       duration: '2h',
       color: 'purple',
-      day: 27,
+      startDay: 3,
+      endDay: 4,
       userId: 'pam-gonzalez'
     },
     {
@@ -29,7 +32,8 @@ const Index = () => {
       subtitle: 'Site redesign\nNIO',
       duration: '6h',
       color: 'blue',
-      day: 28,
+      startDay: 4,
+      endDay: 6,
       userId: 'pam-gonzalez'
     },
     {
@@ -38,7 +42,8 @@ const Index = () => {
       subtitle: 'Site redesign\nNIO', 
       duration: '8h',
       color: 'blue',
-      day: 1,
+      startDay: 10,
+      endDay: 12,
       userId: 'pam-gonzalez'
     },
     {
@@ -47,7 +52,8 @@ const Index = () => {
       subtitle: 'Data dashboard\nNIO',
       duration: '4h',
       color: 'pink',
-      day: 4,
+      startDay: 13,
+      endDay: 14,
       userId: 'pam-gonzalez'
     },
     {
@@ -56,7 +62,8 @@ const Index = () => {
       subtitle: 'Summer campaign\nAirbnb',
       duration: '6h',
       color: 'cyan',
-      day: 27,
+      startDay: 3,
+      endDay: 5,
       userId: 'rachel-li'
     },
     {
@@ -65,7 +72,8 @@ const Index = () => {
       subtitle: 'Internal',
       duration: '8h',
       color: 'purple',
-      day: 31,
+      startDay: 7,
+      endDay: 10,
       userId: 'rachel-li'
     },
     {
@@ -74,7 +82,8 @@ const Index = () => {
       subtitle: 'APAC campaign\nSelecta',
       duration: '6h',
       color: 'brown',
-      day: 4,
+      startDay: 11,
+      endDay: 13,
       userId: 'rachel-li'
     },
     {
@@ -83,7 +92,8 @@ const Index = () => {
       subtitle: 'Site redesign\nNIO',
       duration: '6h',
       color: 'blue',
-      day: 29,
+      startDay: 4,
+      endDay: 6,
       userId: 'tami-aguta'
     },
     {
@@ -91,7 +101,8 @@ const Index = () => {
       title: 'Copy review / EMEA launch / Grab',
       duration: '4h',
       color: 'purple',
-      day: 1,
+      startDay: 10,
+      endDay: 11,
       userId: 'tami-aguta'
     },
     {
@@ -100,7 +111,8 @@ const Index = () => {
       subtitle: 'Site redesign\nNIO',
       duration: '6h',
       color: 'blue',
-      day: 5,
+      startDay: 12,
+      endDay: 14,
       userId: 'tami-aguta'
     },
     {
@@ -109,7 +121,8 @@ const Index = () => {
       subtitle: 'Data dashboard\nNIO',
       duration: '8h',
       color: 'pink',
-      day: 29,
+      startDay: 5,
+      endDay: 7,
       userId: 'xavier-ivison'
     },
     {
@@ -118,7 +131,8 @@ const Index = () => {
       subtitle: 'Summer campaign\nAirbnb',
       duration: '6h',
       color: 'cyan',
-      day: 1,
+      startDay: 10,
+      endDay: 12,
       userId: 'xavier-ivison'
     },
     {
@@ -126,7 +140,8 @@ const Index = () => {
       title: 'App build',
       duration: '8h',
       color: 'green',
-      day: 30,
+      startDay: 6,
+      endDay: 10,
       userId: 'placeholder-role'
     },
     {
@@ -134,18 +149,26 @@ const Index = () => {
       title: 'App build',
       duration: '6h',
       color: 'green',
-      day: 1,
+      startDay: 11,
+      endDay: 14,
       userId: 'placeholder-role'
     }
   ]);
 
-  const handleTaskMove = (taskId: string, newDay: number, newUserId: string) => {
+  const handleTaskMove = (taskId: string, newStartDay: number, newUserId: string) => {
     setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === taskId 
-          ? { ...task, day: newDay, userId: newUserId }
-          : task
-      )
+      prevTasks.map(task => {
+        if (task.id === taskId) {
+          const duration = task.endDay - task.startDay;
+          return { 
+            ...task, 
+            startDay: newStartDay, 
+            endDay: newStartDay + duration,
+            userId: newUserId 
+          };
+        }
+        return task;
+      })
     );
   };
 
