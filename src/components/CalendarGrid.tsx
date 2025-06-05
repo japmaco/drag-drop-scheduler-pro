@@ -123,7 +123,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
         </div>
         
         {/* Day names grid */}
-        <div className="grid grid-cols-11 gap-px">
+        <div className="grid gap-px" style={{ gridTemplateColumns: '300px repeat(10, 1fr)' }}>
           {/* Empty cell for the name column */}
           <div className="bg-gray-900 p-4 border-r border-gray-800"></div>
           {days.map((day, index) => (
@@ -144,16 +144,16 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
       {/* Calendar Body with team member rows */}
       <div className="bg-gray-800">
         {users.map((user) => (
-          <div key={user.id} className="grid grid-cols-11 gap-px border-b border-gray-800 last:border-b-0">
-            {/* Team member name column */}
+          <div key={user.id} className="grid gap-px border-b border-gray-800 last:border-b-0" style={{ gridTemplateColumns: '300px repeat(10, 1fr)' }}>
+            {/* Team member name column - increased width */}
             <div className="bg-gray-900 p-4 border-r border-gray-800 flex items-center">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                   {user.name.split(' ').map(n => n[0]).join('')}
                 </div>
-                <div>
-                  <div className="text-white text-sm font-medium">{user.name}</div>
-                  <div className="text-gray-400 text-xs">{user.role}</div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-white text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">{user.name}</div>
+                  <div className="text-gray-400 text-xs whitespace-nowrap overflow-hidden text-ellipsis">{user.role}</div>
                 </div>
               </div>
             </div>
