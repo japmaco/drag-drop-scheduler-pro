@@ -26,17 +26,35 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   const [draggedTask, setDraggedTask] = useState<string | null>(null);
   const [editingTask, setEditingTask] = useState<string | null>(null);
 
+  // Get current date and week
+  const today = new Date();
+  const currentDay = today.getDate();
+  const currentMonth = today.getMonth(); // 0-based (5 = June)
+  const currentYear = today.getFullYear();
+  
+  // Calculate week number
+  const getWeekNumber = (date: Date) => {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  };
+  
+  const weekNumber = getWeekNumber(today);
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                     'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  // Generate days centered around today (June 5th)
   const days = [
-    { day: 27, name: 'Mon 27' },
-    { day: 28, name: 'Tue 28' },
-    { day: 29, name: 'Wed 29' },
-    { day: 30, name: 'Thu 30' },
-    { day: 31, name: 'Fri 31' },
-    { day: 1, name: 'Mon 1', isNext: true },
-    { day: 2, name: 'Tue 2', isNext: true },
-    { day: 3, name: 'Wed 3', isNext: true },
-    { day: 4, name: 'Thu 4', isNext: true },
-    { day: 5, name: 'Fri 5', isNext: true }
+    { day: 3, name: 'Mon 3', dayOfWeek: 'Mon' },
+    { day: 4, name: 'Tue 4', dayOfWeek: 'Tue' },
+    { day: 5, name: 'Wed 5', dayOfWeek: 'Wed', isToday: true },
+    { day: 6, name: 'Thu 6', dayOfWeek: 'Thu' },
+    { day: 7, name: 'Fri 7', dayOfWeek: 'Fri' },
+    { day: 10, name: 'Mon 10', dayOfWeek: 'Mon' },
+    { day: 11, name: 'Tue 11', dayOfWeek: 'Tue' },
+    { day: 12, name: 'Wed 12', dayOfWeek: 'Wed' },
+    { day: 13, name: 'Thu 13', dayOfWeek: 'Thu' },
+    { day: 14, name: 'Fri 14', dayOfWeek: 'Fri' }
   ];
 
   const users = [
@@ -71,26 +89,29 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
 
   return (
     <div className="flex-1 bg-gray-950 overflow-auto">
-      {/* Header with day names */}
+      {/* Header with week info and day names */}
       <div className="sticky top-0 bg-gray-900 border-b border-gray-800 z-10">
+        {/* Week number header */}
+        <div className="bg-gray-800 px-6 py-3 border-b border-gray-700">
+          <h2 className="text-white text-lg font-semibold">
+            Week {weekNumber} {monthNames[currentMonth]} {currentYear}
+          </h2>
+        </div>
+        
+        {/* Day names grid */}
         <div className="grid grid-cols-11 gap-px">
           {/* Empty cell for the name column */}
           <div className="bg-gray-900 p-4 border-r border-gray-800"></div>
           {days.map((day, index) => (
             <div key={index} className="bg-gray-900 p-4 text-center border-r border-gray-800 last:border-r-0">
               <div className="text-gray-300 text-sm font-medium">{day.name}</div>
-              {day.isNext && (
-                <div className={`w-8 h-8 mx-auto mt-2 rounded-full flex items-center justify-center text-sm font-medium ${
-                  day.day === 1 ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800'
-                }`}>
-                  {day.day}
-                </div>
-              )}
-              {!day.isNext && (
-                <div className="w-8 h-8 mx-auto mt-2 rounded-full flex items-center justify-center text-sm font-medium text-gray-500">
-                  {day.day}
-                </div>
-              )}
+              <div className={`w-8 h-8 mx-auto mt-2 rounded-full flex items-center justify-center text-sm font-medium ${
+                day.isToday 
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-gray-400 hover:bg-gray-800'
+              }`}>
+                {day.day}
+              </div>
             </div>
           ))}
         </div>

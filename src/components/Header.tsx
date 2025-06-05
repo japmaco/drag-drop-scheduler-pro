@@ -2,11 +2,25 @@
 import React from 'react';
 
 export const Header: React.FC = () => {
+  // Get current date
+  const today = new Date();
+  const getWeekNumber = (date: Date) => {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  };
+  
+  const weekNumber = getWeekNumber(today);
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                     'July', 'August', 'September', 'October', 'November', 'December'];
+  
   return (
     <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-white text-lg font-semibold">43 October 2025</h1>
+          <h1 className="text-white text-lg font-semibold">
+            {weekNumber} {monthNames[today.getMonth()]} {today.getFullYear()}
+          </h1>
           <button className="text-gray-400 hover:text-white transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
