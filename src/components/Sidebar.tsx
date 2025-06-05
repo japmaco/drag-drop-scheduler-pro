@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TeamMember } from './TeamMember';
 
@@ -53,7 +52,7 @@ const teamMembers = [
 export const Sidebar: React.FC = () => {
   return (
     <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col">
-      {/* Header */}
+      {/* Header with navigation */}
       <div className="p-4 border-b border-gray-800">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-white text-xl font-semibold">Schedule</h1>
@@ -95,27 +94,15 @@ export const Sidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* Team Members */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-gray-300 text-sm font-medium">This month</h2>
-            <span className="text-green-400 text-sm font-medium">82%</span>
-          </div>
-          
-          <div className="space-y-1">
-            {teamMembers.map((member) => (
-              <TeamMember
-                key={member.id}
-                name={member.name}
-                role={member.role}
-                avatar={member.avatar}
-                utilization={member.utilization}
-                skills={member.skills}
-                location={member.location}
-              />
-            ))}
-          </div>
+      {/* Team utilization summary */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-gray-300 text-sm font-medium">This month</h2>
+          <span className="text-green-400 text-sm font-medium">82%</span>
+        </div>
+        
+        <div className="text-gray-400 text-sm">
+          Team utilization overview and additional controls can go here.
         </div>
       </div>
     </div>

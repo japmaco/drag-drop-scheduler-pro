@@ -40,11 +40,11 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
   ];
 
   const users = [
-    'pam-gonzalez',
-    'rachel-li', 
-    'tami-aguta',
-    'xavier-ivison',
-    'placeholder-role'
+    { id: 'pam-gonzalez', name: 'Pam Gonzalez', role: 'Senior Designer' },
+    { id: 'rachel-li', name: 'Rachel Li', role: 'Senior Producer' },
+    { id: 'tami-aguta', name: 'Tami Aguta', role: 'Copywriter' },
+    { id: 'xavier-ivison', name: 'Xavier Ivison', role: 'Web Developer' },
+    { id: 'placeholder-role', name: 'Placeholder role', role: 'Mobile Developer' }
   ];
 
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
@@ -73,7 +73,9 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     <div className="flex-1 bg-gray-950 overflow-auto">
       {/* Header with day names */}
       <div className="sticky top-0 bg-gray-900 border-b border-gray-800 z-10">
-        <div className="grid grid-cols-10 gap-px">
+        <div className="grid grid-cols-11 gap-px">
+          {/* Empty cell for the name column */}
+          <div className="bg-gray-900 p-4 border-r border-gray-800"></div>
           {days.map((day, index) => (
             <div key={index} className="bg-gray-900 p-4 text-center border-r border-gray-800 last:border-r-0">
               <div className="text-gray-300 text-sm font-medium">{day.name}</div>
@@ -94,41 +96,57 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
         </div>
       </div>
 
-      {/* Calendar Body */}
-      <div className="grid grid-cols-10 gap-px bg-gray-800">
-        {days.map((day) => (
-          users.map((userId) => (
-            <div
-              key={`${day.day}-${userId}`}
-              className="bg-gray-900 p-3 min-h-[150px] border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors relative"
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, day.day, userId)}
-            >
-              <div className="space-y-2">
-                {getTasksForDayAndUser(day.day, userId).map((task) => (
-                  <TaskBlock
-                    key={task.id}
-                    id={task.id}
-                    title={task.title}
-                    subtitle={task.subtitle}
-                    duration={task.duration}
-                    color={task.color}
-                    isEditing={editingTask === task.id}
-                    onEdit={() => {
-                      setEditingTask(editingTask === task.id ? null : task.id);
-                      onTaskEdit(task.id);
-                    }}
-                    onDragStart={(e) => handleDragStart(e, task.id)}
-                  />
-                ))}
+      {/* Calendar Body with team member rows */}
+      <div className="bg-gray-800">
+        {users.map((user) => (
+          <div key={user.id} className="grid grid-cols-11 gap-px border-b border-gray-800 last:border-b-0">
+            {/* Team member name column */}
+            <div className="bg-gray-900 p-4 border-r border-gray-800 flex items-center">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                  {user.name.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <div className="text-white text-sm font-medium">{user.name}</div>
+                  <div className="text-gray-400 text-xs">{user.role}</div>
+                </div>
               </div>
-              
-              {/* Drop zone indicator */}
-              {draggedTask && (
-                <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
-              )}
             </div>
-          ))
+            
+            {/* Calendar cells for this user */}
+            {days.map((day) => (
+              <div
+                key={`${day.day}-${user.id}`}
+                className="bg-gray-900 p-3 min-h-[100px] border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors relative"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, day.day, user.id)}
+              >
+                <div className="space-y-2">
+                  {getTasksForDayAndUser(day.day, user.id).map((task) => (
+                    <TaskBlock
+                      key={task.id}
+                      id={task.id}
+                      title={task.title}
+                      subtitle={task.subtitle}
+                      duration={task.duration}
+                      color={task.color}
+                      isEditing={editingTask === task.id}
+                      onEdit={() => {
+                        setEditingTask(editingTask === task.id ? null : task.id);
+                        onTaskEdit(task.id);
+                      }}
+                      onDragStart={(e) => handleDragStart(e, task.id)}
+                    />
+                  ))}
+                </div>
+                
+                {/* Drop zone indicator */}
+                {draggedTask && (
+                  <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
+                )}
+              </div>
+            ))}
+          </div>
         ))}
       </div>
     </div>
