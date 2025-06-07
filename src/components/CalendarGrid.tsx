@@ -45,7 +45,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     
     if (view === 'week') {
-      // 14-day view
+      // 14-day view - exactly 14 days
       const startOfWeek = new Date(currentDate);
       const dayOfWeek = currentDate.getDay();
       const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
@@ -130,31 +130,10 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     return tasks.filter(task => task.userId === userId);
   };
 
-  const getDayIndex = (day: number) => {
-    return days.findIndex(d => d.day === day);
-  };
-
-  const getTaskWidth = (task: Task) => {
-    const startIndex = getDayIndex(task.startDay);
-    const endIndex = getDayIndex(task.endDay);
-    
-    if (startIndex === -1 || endIndex === -1) return 1;
-    
-    return endIndex - startIndex + 1;
-  };
-
-  const getTaskStartPosition = (task: Task) => {
-    return getDayIndex(task.startDay);
-  };
-
-  const isTaskVisible = (task: Task) => {
-    const startIndex = getDayIndex(task.startDay);
-    const endIndex = getDayIndex(task.endDay);
-    return startIndex !== -1 || endIndex !== -1;
-  };
-
-  const gridCols = view === 'week' ? 14 : days.length > 21 ? 7 : days.length;
-  const nameColumnWidth = view === 'week' ? '140px' : '140px'; // Reduced by 30%
+  // For 14-day view, we show exactly 14 columns
+  // For month view, we show 7 columns per week
+  const gridCols = view === 'week' ? 14 : 7;
+  const nameColumnWidth = '98px'; // 30% reduction from original 140px
 
   return (
     <div className="flex-1 bg-gray-950 overflow-auto">
@@ -162,27 +141,24 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
       <div className="sticky top-0 bg-gray-900 border-b border-gray-800 z-10">
         <div className="grid gap-px" style={{ gridTemplateColumns: `${nameColumnWidth} repeat(${gridCols}, 1fr)` }}>
           <div className="bg-gray-900 p-1 border-r border-gray-800"></div>
-          {days.map((day, index) => {
-            if (view === 'month' && index >= gridCols) return null;
-            return (
-              <div key={index} className="bg-gray-900 p-1 text-center border-r border-gray-800 last:border-r-0">
-                <div className={`text-xs font-medium ${
-                  view === 'month' && !day.isCurrentMonth ? 'text-gray-600' : 'text-gray-300'
-                }`}>
-                  {day.name}
-                </div>
-                <div className={`w-6 h-6 mx-auto mt-1 rounded-full flex items-center justify-center text-xs font-medium ${
-                  day.isToday 
-                    ? 'bg-blue-600 text-white' 
-                    : view === 'month' && !day.isCurrentMonth
-                    ? 'text-gray-600 hover:bg-gray-800'
-                    : 'text-gray-400 hover:bg-gray-800'
-                }`}>
-                  {day.day}
-                </div>
+          {days.slice(0, gridCols).map((day, index) => (
+            <div key={index} className="bg-gray-900 p-1 text-center border-r border-gray-800 last:border-r-0">
+              <div className={`text-xs font-medium ${
+                view === 'month' && !day.isCurrentMonth ? 'text-gray-600' : 'text-gray-300'
+              }`}>
+                {day.name}
               </div>
-            );
-          })}
+              <div className={`w-6 h-6 mx-auto mt-1 rounded-full flex items-center justify-center text-xs font-medium ${
+                day.isToday 
+                  ? 'bg-blue-600 text-white' 
+                  : view === 'month' && !day.isCurrentMonth
+                  ? 'text-gray-600 hover:bg-gray-800'
+                  : 'text-gray-400 hover:bg-gray-800'
+              }`}>
+                {day.day}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -196,9 +172,9 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                 {users.map((user) => (
                   <div key={`${user.id}-week-${weekIndex}`} className="grid gap-px border-b border-gray-800 last:border-b-0" style={{ gridTemplateColumns: `${nameColumnWidth} repeat(7, 1fr)` }}>
                     {/* Team member name column */}
-                    <div className="bg-gray-900 p-1 border-r border-gray-800 flex items-center min-h-[30px]">
+                    <div className="bg-gray-900 p-1 border-r border-gray-800 flex items-center" style={{ minHeight: '20px' }}>
                       <div className="flex items-center gap-2 w-full">
-                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                        <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                           {user.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -212,9 +188,10 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                     {days.slice(weekIndex * 7, (weekIndex + 1) * 7).map((day, dayIndex) => (
                       <div
                         key={`${day.day}-${user.id}-${weekIndex}`}
-                        className={`bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors min-h-[30px] relative ${
+                        className={`bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors relative ${
                           !day.isCurrentMonth ? 'opacity-50' : ''
                         }`}
+                        style={{ minHeight: '20px' }}
                         onDragOver={handleDragOver}
                         onDrop={(e) => handleDrop(e, day.day, user.id)}
                       >
@@ -251,14 +228,14 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             ))}
           </div>
         ) : (
-          // Week view or single week month view
+          // Week view (14 days) - single row per user
           <>
             {users.map((user) => (
               <div key={user.id} className="grid gap-px border-b border-gray-800 last:border-b-0" style={{ gridTemplateColumns: `${nameColumnWidth} repeat(${gridCols}, 1fr)` }}>
                 {/* Team member name column */}
-                <div className="bg-gray-900 p-1 border-r border-gray-800 flex items-center min-h-[30px]">
+                <div className="bg-gray-900 p-1 border-r border-gray-800 flex items-center" style={{ minHeight: '20px' }}>
                   <div className="flex items-center gap-2 w-full">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                    <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                       {user.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -268,11 +245,12 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                   </div>
                 </div>
                 
-                {/* Day cells for this user */}
+                {/* Day cells for this user - exactly 14 days for week view */}
                 {days.slice(0, gridCols).map((day) => (
                   <div
                     key={`${day.day}-${user.id}`}
-                    className="bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors min-h-[30px] relative"
+                    className="bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors relative"
+                    style={{ minHeight: '20px' }}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, day.day, user.id)}
                   >
