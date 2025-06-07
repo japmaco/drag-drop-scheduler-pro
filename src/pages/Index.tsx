@@ -1,6 +1,4 @@
-
 import React, { useState } from 'react';
-import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
 import { CalendarGrid } from '../components/CalendarGrid';
 
@@ -232,8 +230,7 @@ const Index = () => {
   return (
     <div className="h-screen bg-gray-950 flex flex-col">
       <Header />
-      <div className="flex-1 flex min-h-0">
-        <Sidebar />
+      <div className="flex-1 min-h-0">
         <CalendarGrid 
           tasks={tasks}
           onTaskMove={handleTaskMove}
