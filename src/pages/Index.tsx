@@ -14,6 +14,8 @@ interface Task {
 }
 
 const Index = () => {
+  const [view, setView] = useState<'week' | 'month'>('week');
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
@@ -227,14 +229,43 @@ const Index = () => {
     // Here you would implement task editing functionality
   };
 
+  const handleNavigate = (direction: 'prev' | 'next' | 'today') => {
+    const newDate = new Date(currentDate);
+    
+    if (direction === 'today') {
+      setCurrentDate(new Date());
+    } else if (direction === 'prev') {
+      if (view === 'week') {
+        newDate.setDate(newDate.getDate() - 7);
+      } else {
+        newDate.setMonth(newDate.getMonth() - 1);
+      }
+      setCurrentDate(newDate);
+    } else if (direction === 'next') {
+      if (view === 'week') {
+        newDate.setDate(newDate.getDate() + 7);
+      } else {
+        newDate.setMonth(newDate.getMonth() + 1);
+      }
+      setCurrentDate(newDate);
+    }
+  };
+
   return (
     <div className="h-screen bg-gray-950 flex flex-col">
-      <Header />
+      <Header 
+        view={view}
+        onViewChange={setView}
+        onNavigate={handleNavigate}
+        currentDate={currentDate}
+      />
       <div className="flex-1 min-h-0">
         <CalendarGrid 
           tasks={tasks}
           onTaskMove={handleTaskMove}
           onTaskEdit={handleTaskEdit}
+          view={view}
+          currentDate={currentDate}
         />
       </div>
     </div>
