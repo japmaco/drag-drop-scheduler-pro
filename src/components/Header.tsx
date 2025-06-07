@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ view, onViewChange, onNavigate, 
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              Week
+              14 Days
             </button>
             <button
               onClick={() => onViewChange('month')}

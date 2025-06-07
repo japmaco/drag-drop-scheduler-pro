@@ -42,13 +42,13 @@ export const TaskBlock: React.FC<TaskBlockProps> = ({
       onClick={onEdit}
       className={`
         ${colorClasses[color]} 
-        rounded-lg p-3 text-white cursor-pointer transition-all duration-200 
+        rounded-lg p-2 text-white cursor-pointer transition-all duration-200 
         hover:scale-105 hover:shadow-lg relative group w-full
-        ${isMultiDay ? 'min-h-[60px]' : ''}
+        ${isMultiDay ? 'min-h-[40px]' : 'min-h-[40px]'}
       `}
     >
       <div className="flex justify-between items-start mb-1">
-        <h4 className="font-medium text-sm leading-tight truncate flex-1 mr-2">{title}</h4>
+        <h4 className="font-medium text-xs leading-tight truncate flex-1 mr-1">{title}</h4>
         <span className="text-xs opacity-75 whitespace-nowrap">{duration}</span>
       </div>
       {subtitle && (
@@ -63,21 +63,14 @@ export const TaskBlock: React.FC<TaskBlockProps> = ({
         <div className="absolute inset-0 border-2 border-white rounded-lg pointer-events-none" />
       )}
       
-      {/* Drag handle - positioned differently for multi-day tasks */}
+      {/* Drag handle */}
       <div className={`absolute opacity-0 group-hover:opacity-50 transition-opacity ${
-        isMultiDay ? 'top-2 left-2' : 'top-2 right-2'
+        isMultiDay ? 'top-1 left-1' : 'top-1 right-1'
       }`}>
         <div className="w-1 h-1 bg-white rounded-full mb-0.5"></div>
         <div className="w-1 h-1 bg-white rounded-full mb-0.5"></div>
         <div className="w-1 h-1 bg-white rounded-full"></div>
       </div>
-      
-      {/* Multi-day indicator */}
-      {isMultiDay && (
-        <div className="absolute bottom-2 right-2 text-xs opacity-60">
-          Multi-day
-        </div>
-      )}
     </div>
   );
 };

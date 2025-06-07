@@ -172,7 +172,6 @@ const Index = () => {
       const taskDuration = movedTask.endDay - movedTask.startDay;
       const daysDifference = newStartDay - originalStartDay;
       
-      // Update the moved task
       updatedTasks[taskIndex] = {
         ...movedTask,
         startDay: newStartDay,
@@ -181,18 +180,14 @@ const Index = () => {
         duration: calculateDynamicDuration(newStartDay, newStartDay + taskDuration)
       };
       
-      // If moving within the same user's row, shift other tasks to prevent overlap
       if (newUserId === movedTask.userId && daysDifference !== 0) {
         updatedTasks.forEach((task, index) => {
           if (index !== taskIndex && task.userId === newUserId) {
-            // Check if this task needs to be moved to avoid overlap
             const movedTaskEnd = newStartDay + taskDuration;
             const taskStart = task.startDay;
             const taskEnd = task.endDay;
             
-            // If the moved task overlaps with this task, shift this task
             if (daysDifference > 0) {
-              // Moving right - shift tasks that overlap
               if (taskStart <= movedTaskEnd && taskEnd >= newStartDay) {
                 const shiftAmount = movedTaskEnd - taskStart + 1;
                 updatedTasks[index] = {
@@ -203,7 +198,6 @@ const Index = () => {
                 };
               }
             } else {
-              // Moving left - shift tasks that overlap
               if (taskStart <= movedTaskEnd && taskEnd >= newStartDay) {
                 const shiftAmount = originalStartDay - (task.endDay + 1);
                 if (shiftAmount < 0) {
@@ -226,7 +220,6 @@ const Index = () => {
 
   const handleTaskEdit = (taskId: string) => {
     console.log('Editing task:', taskId);
-    // Here you would implement task editing functionality
   };
 
   const handleNavigate = (direction: 'prev' | 'next' | 'today') => {
@@ -236,14 +229,14 @@ const Index = () => {
       setCurrentDate(new Date());
     } else if (direction === 'prev') {
       if (view === 'week') {
-        newDate.setDate(newDate.getDate() - 7);
+        newDate.setDate(newDate.getDate() - 14); // Changed from -7 to -14 for 14-day view
       } else {
         newDate.setMonth(newDate.getMonth() - 1);
       }
       setCurrentDate(newDate);
     } else if (direction === 'next') {
       if (view === 'week') {
-        newDate.setDate(newDate.getDate() + 7);
+        newDate.setDate(newDate.getDate() + 14); // Changed from +7 to +14 for 14-day view
       } else {
         newDate.setMonth(newDate.getMonth() + 1);
       }
