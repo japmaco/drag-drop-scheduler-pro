@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TaskBlock } from './TaskBlock';
 
@@ -44,20 +45,20 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     
     if (view === 'week') {
-      // 14-day view instead of 7-day
+      // 14-day view
       const startOfWeek = new Date(currentDate);
       const dayOfWeek = currentDate.getDay();
       const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       startOfWeek.setDate(currentDate.getDate() + mondayOffset);
       
-      for (let i = 0; i < 14; i++) { // Changed from 7 to 14
+      for (let i = 0; i < 14; i++) {
         const day = new Date(startOfWeek);
         day.setDate(startOfWeek.getDate() + i);
         const isToday = day.toDateString() === new Date().toDateString();
         
         days.push({
           day: day.getDate(),
-          name: `${dayNames[i % 7]} ${day.getDate()}`, // Use modulo for day names
+          name: `${dayNames[i % 7]} ${day.getDate()}`,
           dayOfWeek: dayNames[i % 7],
           isToday,
           fullDate: new Date(day)
@@ -85,7 +86,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
       const currentDay = new Date(startDate);
       while (currentDay <= endDate) {
         const dayOfWeek = currentDay.getDay();
-        const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert Sunday (0) to index 6
+        const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
         const isToday = currentDay.toDateString() === new Date().toDateString();
         const isCurrentMonth = currentDay.getMonth() === month;
         
@@ -152,19 +153,19 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
     return startIndex !== -1 || endIndex !== -1;
   };
 
-  const gridCols = view === 'week' ? 14 : days.length > 21 ? 7 : days.length; // Changed from 7 to 14
-  const nameColumnWidth = view === 'week' ? '200px' : '200px'; // Reduced from 300px/250px
+  const gridCols = view === 'week' ? 14 : days.length > 21 ? 7 : days.length;
+  const nameColumnWidth = view === 'week' ? '140px' : '140px'; // Reduced by 30%
 
   return (
     <div className="flex-1 bg-gray-950 overflow-auto">
       {/* Day names grid */}
       <div className="sticky top-0 bg-gray-900 border-b border-gray-800 z-10">
         <div className="grid gap-px" style={{ gridTemplateColumns: `${nameColumnWidth} repeat(${gridCols}, 1fr)` }}>
-          <div className="bg-gray-900 p-2 border-r border-gray-800"></div> {/* Reduced padding from p-4 to p-2 */}
+          <div className="bg-gray-900 p-1 border-r border-gray-800"></div>
           {days.map((day, index) => {
             if (view === 'month' && index >= gridCols) return null;
             return (
-              <div key={index} className="bg-gray-900 p-2 text-center border-r border-gray-800 last:border-r-0"> {/* Reduced padding */}
+              <div key={index} className="bg-gray-900 p-1 text-center border-r border-gray-800 last:border-r-0">
                 <div className={`text-xs font-medium ${
                   view === 'month' && !day.isCurrentMonth ? 'text-gray-600' : 'text-gray-300'
                 }`}>
@@ -195,9 +196,9 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                 {users.map((user) => (
                   <div key={`${user.id}-week-${weekIndex}`} className="grid gap-px border-b border-gray-800 last:border-b-0" style={{ gridTemplateColumns: `${nameColumnWidth} repeat(7, 1fr)` }}>
                     {/* Team member name column */}
-                    <div className="bg-gray-900 p-2 border-r border-gray-800 flex items-center">
+                    <div className="bg-gray-900 p-1 border-r border-gray-800 flex items-center min-h-[30px]">
                       <div className="flex items-center gap-2 w-full">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                           {user.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div className="min-w-0 flex-1">
@@ -207,25 +208,43 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                       </div>
                     </div>
                     
-                    {/* Calendar row for this user and week */}
-                    <div className="col-span-7 relative bg-gray-900 min-h-[60px]">
-                      <div className="grid grid-cols-7 gap-px h-full">
-                        {days.slice(weekIndex * 7, (weekIndex + 1) * 7).map((day, dayIndex) => (
-                          <div
-                            key={`${day.day}-${user.id}-${weekIndex}`}
-                            className={`bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors ${
-                              !day.isCurrentMonth ? 'opacity-50' : ''
-                            }`}
-                            onDragOver={handleDragOver}
-                            onDrop={(e) => handleDrop(e, day.day, user.id)}
-                          >
-                            {draggedTask && (
-                              <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
-                            )}
-                          </div>
-                        ))}
+                    {/* Day cells for this user and week */}
+                    {days.slice(weekIndex * 7, (weekIndex + 1) * 7).map((day, dayIndex) => (
+                      <div
+                        key={`${day.day}-${user.id}-${weekIndex}`}
+                        className={`bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors min-h-[30px] relative ${
+                          !day.isCurrentMonth ? 'opacity-50' : ''
+                        }`}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, day.day, user.id)}
+                      >
+                        {/* Tasks for this specific day and user */}
+                        {getTasksForUser(user.id)
+                          .filter(task => task.startDay <= day.day && task.endDay >= day.day)
+                          .map((task) => (
+                            <div key={task.id} className="mb-1">
+                              <TaskBlock
+                                id={task.id}
+                                title={task.title}
+                                subtitle={task.subtitle}
+                                duration={task.duration}
+                                color={task.color}
+                                isEditing={editingTask === task.id}
+                                isMultiDay={task.endDay > task.startDay}
+                                onEdit={() => {
+                                  setEditingTask(editingTask === task.id ? null : task.id);
+                                  onTaskEdit(task.id);
+                                }}
+                                onDragStart={(e) => handleDragStart(e, task.id)}
+                              />
+                            </div>
+                          ))}
+                        
+                        {draggedTask && (
+                          <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
+                        )}
                       </div>
-                    </div>
+                    ))}
                   </div>
                 ))}
               </div>
@@ -237,58 +256,31 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             {users.map((user) => (
               <div key={user.id} className="grid gap-px border-b border-gray-800 last:border-b-0" style={{ gridTemplateColumns: `${nameColumnWidth} repeat(${gridCols}, 1fr)` }}>
                 {/* Team member name column */}
-                <div className="bg-gray-900 p-2 border-r border-gray-800 flex items-center"> {/* Reduced padding */}
+                <div className="bg-gray-900 p-1 border-r border-gray-800 flex items-center min-h-[30px]">
                   <div className="flex items-center gap-2 w-full">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                       {user.name.split(' ').map(n => n[0]).join('')}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-white text-xs font-medium truncate">{user.name}</div> {/* Reduced text size */}
+                      <div className="text-white text-xs font-medium truncate">{user.name}</div>
                       <div className="text-gray-400 text-xs truncate">{user.role}</div>
                     </div>
                   </div>
                 </div>
                 
-                {/* Calendar row for this user */}
-                <div className={`col-span-${gridCols} relative bg-gray-900 min-h-[60px]`}> {/* Reduced height from 100px to 60px */}
-                  <div className={`grid grid-cols-${gridCols} gap-px h-full`}>
-                    {days.slice(0, gridCols).map((day) => (
-                      <div
-                        key={`${day.day}-${user.id}`}
-                        className="bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors" // Reduced padding from p-3 to p-1
-                        onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, day.day, user.id)}
-                      >
-                        {draggedTask && (
-                          <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Tasks positioned absolutely */}
-                  <div className="absolute inset-0 p-1"> {/* Reduced padding from p-3 to p-1 */}
-                    {getTasksForUser(user.id).map((task) => {
-                      if (!isTaskVisible(task)) return null;
-                      
-                      const startPos = getTaskStartPosition(task);
-                      const width = getTaskWidth(task);
-                      
-                      if (startPos === -1) return null;
-                      
-                      const leftPercentage = (startPos / gridCols) * 100;
-                      const widthPercentage = (width / gridCols) * 100;
-                      
-                      return (
-                        <div
-                          key={task.id}
-                          className="absolute top-1" // Reduced from top-3 to top-1
-                          style={{
-                            left: `${leftPercentage}%`,
-                            width: `${widthPercentage - 0.5}%`,
-                            zIndex: 10
-                          }}
-                        >
+                {/* Day cells for this user */}
+                {days.slice(0, gridCols).map((day) => (
+                  <div
+                    key={`${day.day}-${user.id}`}
+                    className="bg-gray-900 p-1 border-r border-gray-800 last:border-r-0 hover:bg-gray-800/30 transition-colors min-h-[30px] relative"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, day.day, user.id)}
+                  >
+                    {/* Tasks for this specific day and user */}
+                    {getTasksForUser(user.id)
+                      .filter(task => task.startDay <= day.day && task.endDay >= day.day)
+                      .map((task) => (
+                        <div key={task.id} className="mb-1">
                           <TaskBlock
                             id={task.id}
                             title={task.title}
@@ -296,7 +288,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                             duration={task.duration}
                             color={task.color}
                             isEditing={editingTask === task.id}
-                            isMultiDay={width > 1}
+                            isMultiDay={task.endDay > task.startDay}
                             onEdit={() => {
                               setEditingTask(editingTask === task.id ? null : task.id);
                               onTaskEdit(task.id);
@@ -304,10 +296,13 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
                             onDragStart={(e) => handleDragStart(e, task.id)}
                           />
                         </div>
-                      );
-                    })}
+                      ))}
+                    
+                    {draggedTask && (
+                      <div className="absolute inset-0 border-2 border-dashed border-blue-500/30 rounded-lg pointer-events-none opacity-0 hover:opacity-100 transition-opacity" />
+                    )}
                   </div>
-                </div>
+                ))}
               </div>
             ))}
           </>
